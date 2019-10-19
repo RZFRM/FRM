@@ -1,0 +1,305 @@
+{% extends "base_iframe.html"  %}
+{% load staticfiles %}
+{% block iframe_info  %}
+
+<style>
+  .layui-col-md8{
+    width:100%;
+  }
+  .me-icon{
+    display: flex;
+    justify-content:left;
+    padding-top:27px;
+    margin-left:36px;
+  }
+  .me-icon>span{
+    margin-left:10px;
+  }
+  .layui-clear{ 
+    display: flex;
+    flex-wrap:wrap;
+    justify-content: flex-start;
+  }
+  .list-item{
+      position: relative;
+      /* width:365px !important;
+      height:287px !important; */
+      background: none;
+      margin:29px 39px 0 0 !important;
+      box-shadow:0px 0px 2px 0px rgba(8,1,3,0.43)
+  }
+  .list-item>img{
+    padding:0 !important;
+  }
+  .list-item>p{
+    font-size: 17px !important;
+    padding: 0 18px !important;
+  }
+  .list-item>p:nth-child(2){
+    color: #333 !important;
+    margin:18px 0 12px 0 !important;
+    font-weight:bold !important;
+  }
+  .list-item>p:nth-child(3){
+    color: #666 !important;
+  }
+  .popout{
+    /* width: 365px;
+    height: 287px; */
+    position: absolute;
+    left:0;
+    top:0px;
+    opacity: 0;
+  }
+  /* .popout>div:first-child{
+    width: 365px;
+    height:205px;
+  } */
+  .popout span{
+    /* font-size: 24px !important; */
+    color:#fff !important;
+    font-weight:bold;
+    text-align: center;
+    /* line-height: 205px; */
+    text-shadow:3px 3px 5px rgb(8,1,3);
+  }
+  .popout>div:last-child{
+    /* height:82px; */
+    background: rgba(66,66,66,1);
+    padding:0 10px;
+  }
+  .popout a{
+    /* width:107px;
+    height:35px;
+    font-size:17px; */
+    font-weight:bold;
+    color:#fff;
+    /* line-height: 35px; */
+    display: block;
+    float: left;
+    background:rgba(30,159,255,1);
+    border-radius:15px;
+    /* margin-top:24px  */
+  }
+  .popout a+a{
+    margin-left: 10px;
+  }
+  @media screen and (min-width:1300px){
+    .list-item,.popout{
+      width:365px !important;
+      height:287px !important;
+    }
+    .list-item>img,.popout>div:first-child{
+      width:365px !important;
+      height:205px !important;
+    }
+    .popout>div:last-child{
+      width:365px;
+      height:82px;
+      box-sizing: border-box;
+    }
+    .popout span{
+      font-size: 24px !important;
+      line-height: 205px;
+    }
+    .popout a{
+      width:107px;
+      height:35px;
+      font-size:17px;
+      line-height: 35px;
+      margin-top:24px
+    }
+    .list-item>p{
+      font-size: 17px !important;
+      padding: 0 18px !important;
+    }
+  }
+  @media screen and (max-width:1299px){
+    .list-item,.popout{
+      width:304px !important;
+      height:238px !important;
+    }
+    .list-item>img,.popout>div:first-child{
+      width:304px !important;
+      height:172px !important;
+    }
+    .popout>div:last-child{
+      width:304px;
+      height:66px;
+      box-sizing: border-box;
+    }
+    .popout span{
+      font-size: 20px !important;
+      line-height: 172px;
+    }
+    .popout a{
+      width:90px;
+      height:30px;
+      font-size:14px;
+      line-height: 30px;
+      margin-top:19px
+    }
+    .popout a+a{
+      margin-left: 7px;
+    }
+    .list-item>p{
+      font-size: 14px !important;
+      padding: 0 18px !important;
+    }
+    .list-item>p:nth-child(2){
+      margin:13px 0 6px 0 !important;
+    }
+  }
+</style>
+
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md8">
+        <div class="layui-row layui-col-space15">
+          <div class="content" >
+
+            <div class="product-list-box" id="product-list-box" >
+                 <div class="product-list-cont w1200" style="width: 100%; height: 100%">
+                      <div class="me-icon">
+                        <img src="../static/res/static/img/818866012930bde6b8f281819340f25.png">
+                        <span>我的机器人</span>
+                      </div>
+                     <div class="product-item-box layui-clear " style="width: 98%;padding-left: 36px;">
+
+                          <div class="list-item">
+                            <!-- <a name="GeShui"  lay-href="javascript:;"></a> -->
+                            <img src="../static/res/static/img/142a89205af8ee162fce35f529243f4.png">
+                            <p>采购请购机器人</p>
+                            <p>有效期截 至：2019年8月23日</p>
+                            <div class="popout" onmousemove="over(this)" onmouseout="out(this)">
+                              <div>
+                                  <span>采购请购机器人</span>
+                              </div>
+                              <div>
+                                <a href="javascript:;">业务管理</a>
+                                <a href="javascript:;">任务管理</a>
+                                <a href="javascript:;">基础配置</a>
+                                <p style="clear: both"></p>
+                              </div>
+                            </div>
+                          </div>
+                         <div id="list" class="list-item">
+                             <!-- <a name="GeShui"  lay-href="javascript:;"></a> -->
+                              <img src="../static/res/static/img/bba3744d99bd0648af6b4f90b3bed8f.png">
+                              <p>个税申报机器人（广东）</p>
+                              <p>有效期截至：2019年8月23日</p>
+                              <div class="popout" onmousemove="over(this)" onmouseout="out(this)">
+                                <div>
+                                    <span>个税申报机器人（广东）</span>
+                                </div>
+                                <div>
+                                  <a href="javascript:;">业务管理</a>
+                                  <a href="javascript:;">任务管理</a>
+                                  <a href="javascript:;">基础配置</a>
+                                  <p style="clear: both"></p>
+                                </div>
+                              </div>
+                          </div>
+
+                           <div class="list-item">
+                            <!-- <a name="NewProject1"  lay-href="javascript:;"></a> -->
+                            <img src="../static/res/static/img/f2f71092befaad3c4e41ea7a4cc6cd0.png">
+                            <p>个税申报机器人（广东）</p>
+                            <p>有效期截至：2019年8月23日</p>
+                            <div class="popout" onmousemove="over(this)" onmouseout="out(this)">
+                              <div>
+                                  <span>个税申报机器人（广东）</span>
+                              </div>
+                              <div>
+                                <a href="javascript:;">业务管理</a>
+                                <a href="javascript:;">任务管理</a>
+                                <a href="javascript:;">基础配置</a>
+                                <p style="clear: both"></p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="list-item">
+                              <!-- <a name="InvoiceCheck0705"   lay-href="javascript:;"></a> -->
+                            <img src="../static/res/static/img/142a89205af8ee162fce35f529243f4.png">
+                            <p>采购请购机器人</p>
+                            <p>有效期截至：2019年8月23日</p>
+                            <div class="popout" onmousemove="over(this)" onmouseout="out(this)">
+                              <div>
+                                  <span>采购请购机器人</span>
+                              </div>
+                              <div>
+                                <a href="javascript:;">业务管理</a>
+                                <a href="javascript:;">任务管理</a>
+                                <a href="javascript:;">基础配置</a>
+                                <p style="clear: both"></p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="list-item">
+                              <!-- <a name="InvoiceCheck0705"   lay-href="javascript:;"></a> -->
+                            <img src="../static/res/static/img/f2f71092befaad3c4e41ea7a4cc6cd0.png">
+                            <p>发票查验机器人</p>
+                            <p>有效期截至：2019年8月23日</p>
+                            <div class="popout" onmousemove="over(this)" onmouseout="out(this)">
+                              <div>
+                                  <span>发票查验机器人</span>
+                              </div>
+                              <div>
+                                <a href="javascript:;">业务管理</a>
+                                <a href="javascript:;">任务管理</a>
+                                <a href="javascript:;">基础配置</a>
+                                <p style="clear: both"></p>
+                              </div>
+                            </div>
+                          </div>
+
+                         <div class="list-item">
+                            <!-- <a name="InvoiceCheck0705"   lay-href="javascript:;"></a> -->
+                            <img src="../static/res/static/img/bba3744d99bd0648af6b4f90b3bed8f.png">
+                            <p>发票查验机器人</p>
+                            <p>有效期截至：2019年8月23日</p>
+                            <div class="popout" onmousemove="over(this)" onmouseout="out(this)">
+                              <div>
+                                  <span>发票查验机器人</span>
+                              </div>
+                              <div>
+                                <a href="javascript:;">业务管理</a>
+                                <a href="javascript:;">任务管理</a>
+                                <a href="javascript:;">基础配置</a>
+                                <p style="clear: both"></p>
+                              </div>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            </div>
+          </div>
+        </div>
+     </div>
+    </div>
+
+
+  </div>
+{% endblock %}
+{% block script_info  %}
+    <script>
+        layui.config({
+              base: '{% static "/layuiadmin/" %}'
+          }).extend({
+              index: '/lib/index'
+        }).use(['index', 'console']);
+  </script>
+  <script>
+    // 遮罩层
+   function over(obj){             
+      obj.style.opacity = 1;
+      obj.style.transition="all 1s";
+    }
+    function out(obj){
+      obj.style.opacity = 0;
+      obj.style.transition="all 1s";      
+    }
+  </script>
+{% endblock %}
