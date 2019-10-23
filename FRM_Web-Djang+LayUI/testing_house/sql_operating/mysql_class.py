@@ -1,5 +1,5 @@
 import pymysql
-from  ..etc.MysqlSetting import *
+from  etc.MysqlSetting import *
 
 
 
