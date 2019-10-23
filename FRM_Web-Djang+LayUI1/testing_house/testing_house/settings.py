@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'getRobot',
     'purchasing_robot',
     'mptt',
+    'teach_task.apps.TeachTaskConfig'
 ]
 
 MIDDLEWARE = [
