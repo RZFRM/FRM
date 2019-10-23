@@ -37,7 +37,7 @@ class Index(View):
 
 class Task(View):
     def get(self,request):
-        admin_user = request.GET.get('admin_user')
+        admin_user = request.COOKIES.get('username')
         sql = "select admin_type from admin_user where admin_user='%s'" % admin_user
         try:
             admin_type = SqlModel().select_one(sql)
@@ -90,7 +90,7 @@ class School(View):
         school_province = request.POST.get('school_province')
         school_city = request.POST.get('school_city')
         admin_name = request.POST.get('admin_name')
-        admin_user = request.POST.get('admin_user')
+        admin_user = request.COOKIES.get('username')    # cookies中获取登入者帐号
         now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
         try:
             result1 = SCHOOL.objects.filter(school_code=int(school_code))
@@ -181,7 +181,7 @@ class Edu(View):
     """教务管理"""
     def get(self,request):
         """教务页面展示"""
-        admin_user = request.GET.get('admin_user')
+        admin_user = request.COOKIES.get('username')
         sql = "select school_code from admin_user where admin_user='%s'" % admin_user
         try:
             school_code = SqlModel().select_one(sql)
@@ -197,3 +197,48 @@ class Edu(View):
                 return JsonResponse({"result": "该登入帐号没有对应学校，请重新登入"})
         except:
             return JsonResponse({"result": "数据库错误，请重试"})
+
+    def post(self,request):
+        """教务新增、修改接口"""
+        admin_name = request.POST.get('admin_name')
+        admin_user = request.POST.get('admin_user')
+        admin_pass = request.POST.get('admin_pass')
+        phone = request.POST.get('phone')
+        admin_state = request.POST.get('admin_state')
+        now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
+        admin_type = "2"
+        log_accounts = request.COOKIES.get('username')   # 登入者帐号，创建人
+
+        sql = "select admin_name,school_code from admin_user where admin_user='%s'" % log_accounts
+        sql2 = "select school_code from admin_user where admin_user='%s'" % admin_user   # 该语句判断数据是否存在，是新增还是修改
+        try:
+            admin_list = SqlModel().select_one(sql)   # admin_list[0] = admin_name = create_name , admin_list[1] = school_code
+            res = SqlModel().select_one(sql2)
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误，请重试"})
+
+        if res:
+            """修改接口"""
+            sql_revise = "update admin_user set admin_name='%s',admin_user='%s',admin_pass='%s',admin_type='%s',phone='%s',school_code='%s',admin_state='%s',create_name='%s',create_time='%s' where admin_user='%s'" % (admin_name,admin_user,admin_pass,admin_type,phone,admin_list[1],admin_state,admin_list[0],now_time,admin_user)
+            resu = SqlModel().insert_or_update(sql_revise)
+            if resu:
+                return JsonResponse({"result": "修改成功"})
+            else:
+                return JsonResponse({"result": "修改失败"})
+        else:
+            """新增接口"""  # TODO 这里继续
+            sql_add = "insert into admin_user "
+
+
+            return JsonResponse({"result": ""})
+
+
+
+
+
+
+
+
+
+
+
