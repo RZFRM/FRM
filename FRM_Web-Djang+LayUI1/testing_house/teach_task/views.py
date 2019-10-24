@@ -9,7 +9,7 @@ import datetime
 from django.http import HttpResponse,JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
-from .models import User, School as SCHOOL
+from .models import User, Major as MAJOR, School as SCHOOL
 from sql_operating.mysql_class import SqlModel
 from .common import province_city
 
@@ -23,16 +23,16 @@ class Index(View):
         admin_user = request.POST.get('username')
         admin_pass = request.POST.get('pwd')
         try:
-            mysql_username = User.objects.filter(admin_user=admin_user).first()
-            mysql_password = User.objects.filter(admin_pass=admin_pass)
-        except:
-            return JsonResponse({'result': 'fail'})
-        if mysql_username:
-            if mysql_password:
+            admin = User.objects.filter(admin_user=admin_user).first()
+            user = admin.admin_user
+            password = admin.admin_pass
+            state = admin.admin_state
+            if user == admin_user and password == admin_pass and state == "True":
                 return JsonResponse({'result': 'success','username':admin_user})
-            return JsonResponse({'result': 'fail'})
-        else:
-            return JsonResponse({'result': 'fail'})
+            else:
+                return JsonResponse({'result': 'fail'})
+        except:
+            return JsonResponse({"result": "fail","msg": "该帐号没有权限登入"})
 
 
 class Task(View):
@@ -117,7 +117,7 @@ class School(View):
 class School_delete_search(View):
     """get请求，学校删除接口，post请求，学校搜索接口"""
     def get(self,request):
-        """学校修改功能"""
+        """学校删除功能"""
         school_code = request.GET.get("school_code")
 
         sql = "delete from school where school_code='%s'" % int(school_code)
@@ -126,11 +126,12 @@ class School_delete_search(View):
             if res:
                 return JsonResponse({"result": "删除成功"})
             else:
-                return JsonResponse({"result": "删除失败", "msg": "该学校信息不存在"})
+                return JsonResponse({"result": "删除失败,请重试"})
         except:
             return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
 
     def post(self,request):
+        """搜索功能,按名称搜索"""
         school_name = request.POST.get('school_name')
         sql = "select school_code,school_name,school_rank,school_type,school_province,school_city,admin_name,create_name,create_time from school where school_name like '%%%s%%'" % school_name
         try:
@@ -151,6 +152,7 @@ def province(request):
 
     return JsonResponse({"result":province_list})
 
+
 def city(request):
     """学校页面，城市下拉接口"""
     city_list=[]
@@ -162,6 +164,7 @@ def city(request):
         return JsonResponse({"result": city_list})
     else:
         return JsonResponse({"result": ""})
+
 
 def edu(request):
     """学校页面，教务管理员下拉接口"""
@@ -190,11 +193,14 @@ class Edu(View):
                 sql = "select admin_name,admin_user,admin_pass,phone,admin_state,create_name,create_time from admin_user where school_code='%s'" % int(school_code)
                 edu_list = SqlModel().select_all(sql)
                 if edu_list:
+                    print(edu_list)
+                    for i in edu_list:
+                        i[6] = str(i[6])[:10]
                     return JsonResponse({"resutlt": edu_list})
                 else:
                     return JsonResponse({"result": ""})
             else:
-                return JsonResponse({"result": "该登入帐号没有对应学校，请重新登入"})
+                return JsonResponse({"result": "该登入帐号没有对应学校，无法显示教务信息"})
         except:
             return JsonResponse({"result": "数据库错误，请重试"})
 
@@ -208,37 +214,140 @@ class Edu(View):
         now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
         admin_type = "2"
         log_accounts = request.COOKIES.get('username')   # 登入者帐号，创建人
-
+        # log_accounts = request.POST.get('username')   # 登入者帐号，创建人
         sql = "select admin_name,school_code from admin_user where admin_user='%s'" % log_accounts
-        sql2 = "select school_code from admin_user where admin_user='%s'" % admin_user   # 该语句判断数据是否存在，是新增还是修改
+        sql2 = "select * from admin_user where admin_user='%s'" % admin_user   # 该语句判断数据是否存在，是新增还是修改
         try:
             admin_list = SqlModel().select_one(sql)   # admin_list[0] = admin_name = create_name , admin_list[1] = school_code
             res = SqlModel().select_one(sql2)
+            if res:
+                """修改接口"""
+                sql_revise = "update admin_user set admin_name='%s',admin_user='%s',admin_pass='%s',admin_type='%s',phone='%s',school_code='%s',admin_state='%s',create_name='%s',create_time='%s' where admin_user='%s'" % (admin_name,admin_user,admin_pass,admin_type,phone,admin_list[1],admin_state,admin_list[0],now_time,admin_user)
+                res_up = SqlModel().insert_or_update(sql_revise)
+                if res_up:
+                    return JsonResponse({"result": "修改成功"})
+                else:
+                    return JsonResponse({"result": "修改失败"})
+            else:
+                """新增接口"""
+                sql_add = "insert into admin_user (admin_name,admin_user,admin_pass,admin_type,phone,school_code,admin_state,create_name,create_time) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (admin_name,admin_user,admin_pass,admin_type,int(phone),int(admin_list[1]),admin_state,admin_list[0],now_time)
+                res_add = SqlModel().insert_or_update(sql_add)
+                if res_add:
+                    return JsonResponse({"result": "新增成功"})
+                else:
+                    return JsonResponse({"result": "新增失败"})
         except:
             return JsonResponse({"result": "fail", "msg": "数据库错误，请重试"})
 
-        if res:
-            """修改接口"""
-            sql_revise = "update admin_user set admin_name='%s',admin_user='%s',admin_pass='%s',admin_type='%s',phone='%s',school_code='%s',admin_state='%s',create_name='%s',create_time='%s' where admin_user='%s'" % (admin_name,admin_user,admin_pass,admin_type,phone,admin_list[1],admin_state,admin_list[0],now_time,admin_user)
-            resu = SqlModel().insert_or_update(sql_revise)
-            if resu:
-                return JsonResponse({"result": "修改成功"})
+
+class Edu_delete_search(View):
+    """教务删除、搜索功能"""
+    def get(self,request):
+        """教务删除功能"""
+        admin_user = request.GET.get("admin_user")
+
+        sql = "delete from admin_user where admin_user='%s'" % admin_user
+        try:
+            res = SqlModel().insert_or_update(sql)
+            if res:
+                return JsonResponse({"result": "删除成功"})
             else:
-                return JsonResponse({"result": "修改失败"})
-        else:
-            """新增接口"""  # TODO 这里继续
-            sql_add = "insert into admin_user "
+                return JsonResponse({"result": "删除失败,请重试"})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
+
+    def post(self,request):
+        admin_name = request.POST.get('admin_name')
+        sql = "select admin_name,admin_user,admin_pass,phone,admin_state,create_name,create_time from admin_user where admin_name like '%%%s%%'" % admin_name
+        try:
+            admin_info = SqlModel().select_all(sql)
+            if admin_info:
+                return JsonResponse({"result": admin_info})
+            else:
+                return JsonResponse({"result": ""})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
 
 
-            return JsonResponse({"result": ""})
+class Major(View):
+    """专业模块"""
+    def get(self,request):
+        """GET请求，专业展示"""
+        admin_user = request.COOKIES.get('username')
+        # admin_user = request.GET.get('username')  # 测试用
+
+        sql = "select school_code from admin_user where admin_user='%s'" % admin_user
+        try:
+            school_code = SqlModel().select_one(sql)
+            if school_code:
+                sql_info = "select major_code,major_name,major_state,create_name,create_time from major where school_code='%s'" % int(school_code[0])
+                major_list = SqlModel().select_all(sql_info)
+                if major_list:
+                    for i in major_list:
+                        i[4] = str(i[4])[:10]
+                    return JsonResponse({"result": major_list})
+                else:
+                    return JsonResponse({"result": ""})
+            else:
+                return JsonResponse({"result": "该登入帐号没有对应学校，无法显示专业信息"})
+        except:
+            return JsonResponse({"result": "fail","msg": "数据库错误，请重试"})
+
+    def post(self,request):
+        """POST请求，新增、修改逻辑"""
+        major_name = request.POST.get('major_name')
+        major_code = request.POST.get('major_code')
+        major_state = request.POST.get('major_state')
+        now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
+        # admin_user = request.COOKIES.get('username')    # cookies中获取登入者帐号
+        admin_user = request.POST.get('username')    #  测试用
+        sql = "select admin_name,school_code from admin_user where admin_user = '%s'" % admin_user
+        try:
+            admin_list = SqlModel().select_one(sql)  # admin_name=admin_list[0]  school_code=admin_list[1]
+            result = MAJOR.objects.filter(major_code=int(major_code))
+
+            if result:
+                sql_up = "update major set major_code='%s',major_name='%s',major_state='%s',create_name='%s',create_time='%s' where major_code='%s'" % (int(major_code),major_name,major_state,admin_list[0],now_time,int(major_code))
+                res_update = SqlModel().insert_or_update(sql_up)
+                if res_update:
+                    return JsonResponse({"result": "更新成功"})
+                else:
+                    return JsonResponse({"result": "更新失败"})
+            else:
+                sql_add = "insert into major (major_code,major_name,school_code,major_state,create_name,create_time) values ('%s','%s','%s','%s','%s','%s')" %  (int(major_code),major_name,int(admin_list[1]),major_state,admin_list[0],now_time)
+                res_insert = SqlModel().insert_or_update(sql_add)
+                if res_insert:
+                    return JsonResponse({"result": "插入成功"})
+                else:
+                    return JsonResponse({"result": "插入失败"})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误，请重试"})
 
 
+class Major_delete_search(View):
+    """专业删除、搜索功能"""
+    def get(self,request):
+        major_code = request.GET.get("major_code")
+        sql = "delete from major where major_code='%s'" % major_code
+        try:
+            res = SqlModel().insert_or_update(sql)
+            if res:
+                return JsonResponse({"result": "删除成功"})
+            else:
+                return JsonResponse({"result": "删除失败"})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
 
+    def post(self,request):
+        """搜索功能"""
+        major_name = request.POST.get("major_name")
+        sql = "select major_name,major_code,major_state,create_name,create_time from major where major_name like '%%%s%%'" % major_name
 
-
-
-
-
-
-
-
+        try:
+            major_list = SqlModel().select_all(sql)
+            if major_list:
+                return JsonResponse({"result": major_list})
+            else:
+                return JsonResponse({"result": ""})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})

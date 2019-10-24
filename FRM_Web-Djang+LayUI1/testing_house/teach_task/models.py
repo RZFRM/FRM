@@ -9,7 +9,7 @@ class User(models.Model):
     admin_user = models.CharField(max_length=50, null=None, unique=True,verbose_name='帐号')
     admin_pass = models.CharField(max_length=50, null=None,verbose_name='密码')
     admin_type = models.CharField(max_length=10,verbose_name='分类，1：内部，2：教务，3：老师，4:学生')
-    phone = models.IntegerField(null=True,verbose_name='电话')
+    phone = models.BigIntegerField(null=True,verbose_name='电话')
     school_code = models.IntegerField(null=True,verbose_name='学校编号')
     admin_state = models.CharField(default="True", choices=(("True", u"有效"), ("False", u"无效")),
                               verbose_name=u"有效性", max_length=10)
@@ -46,7 +46,7 @@ class Major(models.Model):
     major_id = models.AutoField(primary_key=True, verbose_name='专业id')
     major_code = models.IntegerField(unique=True, verbose_name='专业代码')
     major_name = models.CharField(max_length=50, verbose_name='专业名称')
-    major_school = models.CharField(max_length=50, verbose_name='专业学校')
+    school_code = models.IntegerField(unique=True, verbose_name='学校代码')
     major_state = models.CharField(default="True", choices=(("True", u"有效"), ("False", u"无效")),
                               verbose_name=u"有效性", max_length=10)
     create_name = models.CharField(max_length=50, verbose_name='创建人')
@@ -86,7 +86,7 @@ class Student(models.Model):
     student_name = models.CharField(max_length=50, verbose_name='学生姓名')
     student_major = models.CharField(max_length=50, verbose_name='学生专业')
     student_class = models.CharField(max_length=50, verbose_name='学生班级')
-    phone = models.IntegerField(null=True, verbose_name='电话')
+    phone = models.BigIntegerField(null=True, verbose_name='电话')
     create_time = models.DateTimeField(null=True,verbose_name='创建时间')
     amount = models.IntegerField(verbose_name='登入次数')
     sum_time = models.CharField(max_length=50, default='0', verbose_name='时间总和')
