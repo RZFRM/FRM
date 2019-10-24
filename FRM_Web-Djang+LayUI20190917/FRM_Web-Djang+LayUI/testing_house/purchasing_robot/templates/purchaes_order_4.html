@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>第四步</title>
+    <link rel="stylesheet" href="../../static/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../static/res/static/css/purchasing.css">
+    <style>
+        .forn {
+            width: 350px;
+            margin: 0 auto;
+        }
+
+        ul {
+            position: absolute;
+            top: 95px;
+            left: 17px;
+        }
+
+        .atitle > span {
+            margin: 0 auto;
+        }
+
+        .btn {
+            width: 105px;
+            height: 39px;
+            background: rgba(55, 38, 89, 1);
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+            line-height: 39px;
+            border: 0;
+            color: #fff;
+            cursor: pointer;
+            position: absolute;
+            left: 44%;
+            bottom: 32px;
+        }
+    </style>
+</head>
+<body>
+<div class="Popout">
+    <div class="atitle">
+        <span>采购合同申请</span>
+    </div>
+    <ul>
+        <li class="ULI"><a lay-href="/purchaes_requisitions_create" class="ULIP"></a></li>
+        <li class="ULI"><a lay-href="/purchaes_requisitions_determine" class="ULIP"></a></li>
+        <li class="ULI"><a lay-href="/purchaes_order_create" class="ULIP"></a></li>
+        <li><a href="javascript:;"></a></li>
+        <li><a href="javascript:;"></a></li>
+        <li><a href="javascript:;"></a></li>
+        <li><a href="javascript:;"></a></li>
+        <li><a href="javascript:;"></a></li>
+        <li><a href="javascript:;"></a></li>
+        <li><a href="javascript:;"></a></li>
+    </ul>
+
+    <div style="height: 422px;overflow: auto;padding-top:25px">
+        <form class="layui-form forn" action="" lay-filter="component-form-group">
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="padding:5px 15px 5px 10px;;width: 85px;">关联请购单：</label>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <select lay-verify="required" lay-search="" style="width:100%;height: 30px;">
+                        <option value="">直接选择或搜索选择</option>
+                        <option value="1">CG00001</option>
+                        <option value="2">CG00002</option>
+                        <option value="3">CG00003</option>
+                        <option value="4">CG00004</option>
+                        <option value="5">CG00005</option>
+                        <option value="6">CG00006</option>
+                        <option value="7">CG00007</option>
+                        <option value="8">CG00008</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px;"><span class="xing">*</span>合同编号：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" name="contract" lay-verify="required|contract"
+                           class="layui-input" placeholder="请填写编号"
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="padding:5px 15px 5px 10px;;width: 85px;"><span
+                        class="xing">*</span>供应商：</label>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <select lay-verify="required" lay-search="" style="width:100%;height: 30px;">
+                        <option value="">直接选择或搜索选择</option>
+                        <option value="1">大通厂</option>
+                        <option value="2">光明家具厂</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="padding:5px 13px 5px 0px;width: 97px;"><span
+                        class="xing">*</span>税率/征收率：</label>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <select name="modules" lay-verify="required" lay-search="" lay-filter="revenue" id="revenue"
+                            style="width:100%;height: 30px;" onblur="abc()">
+                        <option value="">直接选择或搜索选择</option>
+                        <option value="13">13%</option>
+                        <option value="9">9%</option>
+                        <option value="6">6%</option>
+                        <option value="0">0%</option>
+                        <option value="3">3%</option>
+                        <option value="5">5%</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px 5px 0px;width: 95px;"><span
+                        class="xing">*</span>不含税单价：
+                </lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" lay-verify="required|number" class="layui-input"
+                           placeholder="请输入商品单价" onblur="abc()" id="money"
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px;"><span class="xing">*</span>数量：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" lay-verify="required|number" class="layui-input"
+                           placeholder="请输入数量" onblur="abc()" id="numbar"
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px;"><span class="xing">*</span>单位：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" class="layui-input" placeholder="请输入单位  例:台,个"
+                           style="min-height: 30px;line-height: 30px; height: 30px;" lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:4px 15px 5px 0px;width: 95px;">总金额(含税)：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" class="layui-input" value="0" disabled
+                           style="min-height: 30px;line-height: 30px; height: 30px;" id="txtTotal">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="padding:5px 15px;"><span class="xing">*</span>需求日期：</label>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" name="date" id="time1" lay-verify="date" placeholder="yyyy-MM-dd"
+                           autocomplete="off"
+                           class="layui-input" style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px;">申请人：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" class="layui-input" value="纪晶" disabled
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px;">申请部门：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" class="layui-input" value="封边打孔车间（二车间）" disabled
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px 5px 10px;;width: 85px;">申请日期：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" class="layui-input" value="2020/12/6  10:35:21" disabled
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px 5px 10px;;width: 85px;">部门负责人：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" class="layui-input" value="徐蓉" disabled
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <lable class="layui-form-label" style="padding:5px 15px 5px 10px;;width: 85px;">公司负责人：</lable>
+                <div class="layui-input-block" style="min-height: 30px;">
+                    <input type="text" autocomplete="off" class="layui-input" value="孙鸿" disabled
+                           style="min-height: 30px;line-height: 30px; height: 30px;">
+                </div>
+            </div>
+            {#            <a class="btn" href="purchaes_order_determine" class="layui-btn">提交</a>#}
+            <button class="layui-btn btn" lay-submit="" lay-filter="demo4">提交</button>
+        </form>
+    </div>
+</div>
+<script src="../../static/layuiadmin/layui/layui.js"></script>
+<script>
+    function useLayDateMultiple(cls) {
+        layui.use(['form', 'layedit', 'laydate', 'jquery'], function () {
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , $ = layui.jquery
+                , laydate = layui.laydate;
+
+            //日期
+            var laydate = layui.laydate;
+            lay('#' + cls).each(function () {
+                laydate.render({
+                    elem: this,
+                    trigger: 'click'
+                });
+            });
+            //自定义验证规则
+            form.verify({
+                contract: function (value) {
+                    if (!new RegExp("[\\w]{3,}").test(value)) {
+                        return '最少3位数字或字母和_';
+                    }
+                },
+                quantity: function (value) {
+                    if (!new RegExp("([1-9]\d*(\.\d*[1-9])?)|(0\.\d*[1-9])").test(value)) {
+                        return '必须大于0'
+                    }
+                }
+            });
+            form.on('submit(demo4)', function (data) {
+                //通用表单提交(AJAX方式)
+                $.ajax({
+                    url: "/purchaes_order_create_data",
+                    type: "post",
+                    data: $(data.form).serialize(),
+                    success: function () {
+                        location.href = "/purchaes_order_determine";
+                    }
+                });
+            });
+
+
+        });
+
+    }
+
+    useLayDateMultiple('time1');
+    useLayDateMultiple('time2');
+
+
+    function abc() {
+        var myselect = document.getElementById("revenue");//拿到select对象：
+        var index = myselect.selectedIndex; //拿到选中项的索引： selectedIndex代表的是你所选中项的index
+        var revenue = Number(myselect.options[index].value); //拿到选中项options的value：
+        var money = Number(document.getElementById("money").value);
+        var num = Number(document.getElementById("numbar").value);
+
+        if(money>0&&num>0){
+            var txtTotal = document.getElementById("txtTotal");
+            txtTotal.value = (money * num * (revenue/100+1)).toFixed(2);
+            console.log(txtTotal)
+        }
+    }
+
+
+    //    function getSelectedValue() {
+    //        var obj = document.getElementById("revenue");
+    //        return obj.value; //直接用其对象的value属性便可获取到
+    //    }
+    //
+    //    function checkInt(o) {
+    //        theV = isNaN(parseInt(o.value)) ? 0 : parseInt(o.value);
+    //        if (theV != o.value) {
+    //            o.value = theV;
+    //        }
+    //
+    //        txtTotal.value = (txtAmount.value * txtPrice.value * obj.value).toFixed(2);
+    //    }
+    //
+    //    function checkP(o) {
+    //
+    //        var myselect = document.getElementById("revenue");//拿到select对象：
+    //        var index = myselect.selectedIndex; //拿到选中项的索引： selectedIndex代表的是你所选中项的index
+    //        var a = myselect.options[index].value //拿到选中项options的value：
+    //
+    //        theV = isNaN(parseFloat(o.value)) ? 0 : parseFloat(o.value);
+    //        theV = parseInt(theV * 100) / 100;
+    //        if (theV != o.value) {
+    //            theV = (theV * 100).toString();
+    //            theV = theV.substring(0, theV.length - 2) + "." + theV.substring(theV.length - 2, theV.length)
+    //            o.value = theV;
+    //        }
+    //        txtTotal.value = (txtAmount.value * txtPrice.value * a).toFixed(2);
+    //    }
+</script>
+</body>
+</html>
