@@ -574,3 +574,35 @@ class Teacher_delete_search(View):
                 return JsonResponse({"result": ""})
         except:
             return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
+
+
+class Student(View):
+    """学生页面，展示、新增、修改功能"""
+    def get(self,request):
+        """学生页面展示"""
+        student_class = request.GET.get("student_class")
+        sql_student = "select student_code,student_name,student_major,student_class,phone,create_time,amount,sum_time,late_time,study_time,score from student where student_class = '%s'" % student_class
+        try:
+            student_list = SqlModel().select_all(sql_student)
+            if student_list:
+                for i in student_list:
+                    i[5] = str(i[5])[:10]
+                    i[8] = str(i[8])[:10]
+                return JsonResponse({"result": student_list})
+            else:
+                return JsonResponse({"result": ""})
+        except Exception as e:
+            return JsonResponse({"result": "fail", "msg": "数据库错误，请重试"})
+
+    def post(self,request):
+        """学生页面新增，修改功能"""
+        # admin_user = request.COOKIES.get("username")
+        admin_user = request.GET.get("admin_user")  # 测试用
+        sql = "select admin_name.school_code from admin_user where admin_user = '%s'" % admin_user
+        admin_list = SqlModel().select_one(sql)
+        print(admin_list)
+        if admin_list:
+            admin_name = admin_list[0]
+            school_code = admin_list[1]
+
+

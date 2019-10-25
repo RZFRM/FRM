@@ -84,14 +84,16 @@ class Student(models.Model):
     student_id = models.AutoField(primary_key=True, verbose_name='学生id')
     student_code = models.IntegerField(unique=True, verbose_name='学号')
     student_name = models.CharField(max_length=50, verbose_name='学生姓名')
+    school_code = models.IntegerField(verbose_name='学生所在学校')
     student_major = models.CharField(max_length=50, verbose_name='学生专业')
     student_class = models.CharField(max_length=50, verbose_name='学生班级')
     phone = models.BigIntegerField(null=True, verbose_name='电话')
-    create_time = models.DateTimeField(null=True,verbose_name='创建时间')
-    amount = models.IntegerField(verbose_name='登入次数')
-    sum_time = models.CharField(max_length=50, default='0', verbose_name='时间总和')
-    late_time = models.DateTimeField(verbose_name='最后登入时间')
-    study_time = models.CharField(max_length=50, default='0', verbose_name='学习时长')
+    create_time = models.DateTimeField(null=True, verbose_name='创建时间')
+    amount = models.IntegerField(null=True, default=0, verbose_name='登入次数')
+    sum_time = models.CharField(max_length=50,null=True, default='0', verbose_name='时间总和')
+    late_time = models.DateTimeField(null=True, verbose_name='最后登入时间')
+    study_time = models.CharField(max_length=50, null=True, default='0', verbose_name='学习时长')
+    score = models.IntegerField(null=True,verbose_name="得分")
 
     def __str__(self):
         return self.student_name
