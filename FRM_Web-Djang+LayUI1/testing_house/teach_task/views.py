@@ -175,9 +175,9 @@ def edu(request):
     if admin_name:
         for i in admin_name:
             admin_name_list.append(i[0])
-        return JsonResponse({"result":admin_name_list})
+        return JsonResponse({"result": admin_name_list})
     else:
-        return JsonResponse({"result":""})
+        return JsonResponse({"result": ""})
 
 
 class Edu(View):
@@ -299,8 +299,8 @@ class Major(View):
         major_code = request.POST.get('major_code')
         major_state = request.POST.get('major_state')
         now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
-        # admin_user = request.COOKIES.get('username')    # cookies中获取登入者帐号
-        admin_user = request.POST.get('username')    #  测试用
+        admin_user = request.COOKIES.get('username')    # cookies中获取登入者帐号
+        # admin_user = request.POST.get('username')    #  测试用
         sql = "select admin_name,school_code from admin_user where admin_user = '%s'" % admin_user
         try:
             admin_list = SqlModel().select_one(sql)  # admin_name=admin_list[0]  school_code=admin_list[1]
@@ -351,3 +351,136 @@ class Major_delete_search(View):
                 return JsonResponse({"result": ""})
         except:
             return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
+
+
+class Class(View):
+    """班级模块，页面展示、新增与修改功能"""
+    def get(self,request):
+        admin_user = request.COOKIES.get("username")
+        # admin_user = request.GET.get("admin_user")    # 测试用
+        sql = "select school_code from admin_user where admin_user = '%s'" % admin_user
+
+        try:
+            school_code = SqlModel().select_one(sql)
+            if school_code:
+                sql_class = "select class_code,class_name,major_name,class_teacher,class_state,begin_time,close_time,create_name,create_time from class where school_code='%s'" % int(school_code[0])
+                class_info = SqlModel().select_all(sql_class)
+                if class_info:
+                    return JsonResponse({"result": class_info})
+                else:
+                    return JsonResponse({"result": ""})
+            else:
+                return JsonResponse({"result": "该登入帐号没有对应学校，无法显示班级信息"})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误，请重试"})
+
+    def post(self,request):
+        """班级新增、修改功能"""
+        admin_user = request.COOKIES.get("username")
+        # admin_user = request.POST.get("admin_user")   # 测试用
+        class_code = request.POST.get("class_code")
+        class_name = request.POST.get("class_name")
+        major_name = request.POST.get("major_name")
+        class_teacher = request.POST.get("class_teacher")
+        class_state = request.POST.get("class_state")
+        begin_time = request.POST.get("begin_time")
+        close_time = request.POST.get("close_time")
+        now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
+
+        sql_admin = "select admin_name,school_code from admin_user where admin_user = '%s'" % admin_user
+        try:
+            admin_list = SqlModel().select_one(sql_admin)
+            admin_name = admin_list[0]
+            school_code = admin_list[1]
+
+            sql_select = "select * from class where class_code = '%s'" % class_code
+            res = SqlModel().select_one(sql_select)
+            if res:
+                """更新"""
+                sql_up = "update class set class_code='%s',class_name='%s',school_code='%s',class_teacher='%s',class_state='%s',begin_time='%s',close_time='%s',create_time='%s',create_name='%s' where class_code = '%s'" % (int(class_code),class_name,int(school_code),class_teacher,class_state,begin_time,close_time,now_time,admin_name,class_code)
+                res_update = SqlModel().insert_or_update(sql_up)
+                if res_update:
+                    return JsonResponse({"result": "更新成功"})
+                else:
+                    return JsonResponse({"result": "更新失败"})
+            else:
+                """新增"""
+                sql_add = "insert into class (class_code,class_name,major_name,school_code,class_teacher,class_state,begin_time,close_time,create_time,create_name) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (int(class_code),class_name,major_name,int(school_code),class_teacher,class_state,begin_time,close_time,now_time,admin_name)
+                res_insert = SqlModel().insert_or_update(sql_add)
+
+                if res_insert:
+                    return JsonResponse({"result": "插入成功"})
+                else:
+                    return JsonResponse({"result": "插入失败"})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误，请重试"})
+
+
+class Class_delete_search(View):
+    """班级删除、搜索功能"""
+    def get(self,request):
+        """删除功能"""
+        class_code = request.GET.get("class_code")
+        sql = "delete from class where class_code='%s'" % class_code
+        try:
+            res = SqlModel().insert_or_update(sql)
+            if res:
+                return JsonResponse({"result": "删除成功"})
+            else:
+                return JsonResponse({"result": "删除失败"})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
+
+    def post(self,request):
+        """搜索功能"""
+        class_name = request.POST.get("class_name")
+        sql_class = "select class_code,class_name,major_name,class_teacher,class_state,begin_time,close_time,create_name,create_time from class where class_name like '%%%s%%'" % class_name
+        try:
+            class_list = SqlModel().select_all(sql_class)
+            if class_list:
+                return JsonResponse({"result": class_list})
+            else:
+                return JsonResponse({"result": ""})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
+
+
+class Class_down(View):
+    """班级弹框，专业下拉，老师下拉 接口"""
+    def get(self,request):
+        """专业下拉"""
+        admin_user = request.COOKIES.get("username")
+        # admin_user = request.GET.get("admin_user")   # 测试用
+        sql = "select school_code from admin_user where admin_user='%s'" % admin_user
+        try:
+            school_code_list = SqlModel().select_one(sql)
+            if school_code_list:
+                school_code = school_code_list[0]
+                sql_major = "select major_name from major where school_code='%s'" % school_code
+                major_name_list = SqlModel().select_all(sql_major)
+                if major_name_list:
+                    major_list = []
+                    for i in major_name_list:
+                        major_list.append(i[0])
+                    return JsonResponse({"result": major_list})
+                else:
+                    return JsonResponse({"result": ""})
+            else:
+                return JsonResponse({"result": "该登入帐号没有对应学校，无法获取专业信息"})
+        except:
+            return JsonResponse({"result": "fail","msg": "数据库错误，请重试"})
+
+    def post(self,request):
+        """班级弹框，授课老师 下拉"""
+        admin_user = request.COOKIES.get("username")
+        # admin_user = request.POST.get("admin_user")   # 测试用
+        sql = "select admin_name from admin_user as A inner join (select school_code from admin_user where admin_user='%s') as B on A.school_code = B.school_code" % admin_user
+        admin_name_list = SqlModel().select_all(sql)
+        if admin_name_list:
+            admin_list = []
+            for i in admin_name_list:
+                admin_list.append(i[0])
+            print(admin_list)
+            return JsonResponse({"result": admin_list})
+        else:
+            return JsonResponse({"result": ""})

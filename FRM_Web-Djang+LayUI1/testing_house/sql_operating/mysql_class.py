@@ -4,7 +4,6 @@ from  etc.MysqlSetting import *
 
 
 
-
 class SqlModel(object):
     def __init__(self):
         self.host = "192.168.1.152"

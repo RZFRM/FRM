@@ -63,8 +63,8 @@ class Class(models.Model):
     class_id = models.AutoField(primary_key=True, verbose_name='班级id')
     class_code = models.IntegerField(unique=True, verbose_name='班级编号')
     class_name = models.CharField(max_length=50, verbose_name='班级名称')
-    class_major_code = models.IntegerField(verbose_name='班级专业代码')
-    class_school_code = models.IntegerField(verbose_name='班级所在学校')
+    major_name = models.CharField(max_length=50, verbose_name='班级专业')
+    school_code = models.IntegerField(verbose_name='班级所在学校')
     class_teacher = models.CharField(max_length=50, verbose_name='班级老师')
     class_state = models.CharField(default="True", choices=(("True", u"有效"), ("False", u"无效")),
                               verbose_name=u"有效性", max_length=10)
