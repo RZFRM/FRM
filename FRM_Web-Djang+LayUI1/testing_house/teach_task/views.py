@@ -544,4 +544,33 @@ class Teacher(View):
                     else:
                         return JsonResponse({"result": "新增失败"})
         except:
-            return JsonResponse({"result": "fail","msg": "数据库错误，请重试"})
+            return JsonResponse({"result": "fail","msg": "数据  库错误，请重试"})
+
+
+class Teacher_delete_search(View):
+    """教师删除、搜索功能"""
+    def get(self,request):
+        """删除功能"""
+        admin_user = request.GET.get("admin_user")
+        sql = "delete from admin_user where admin_user='%s'" % admin_user
+        try:
+            res = SqlModel().insert_or_update(sql)
+            if res:
+                return JsonResponse({"result": "删除成功"})
+            else:
+                return JsonResponse({"result": "删除失败"})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
+
+    def post(self,request):
+        """搜索功能"""
+        admin_name = request.POST.get("admin_name")
+        sql = "select admin_name,admin_user,admin_pass,phone,admin_state,create_name,create_time from admin_user where admin_name like '%%%s%%'" % admin_name
+        try:
+            class_list = SqlModel().select_all(sql)
+            if class_list:
+                return JsonResponse({"result": class_list})
+            else:
+                return JsonResponse({"result": ""})
+        except:
+            return JsonResponse({"result": "fail", "msg": "数据库错误,请重试"})
