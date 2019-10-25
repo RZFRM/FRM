@@ -169,7 +169,7 @@ def city(request):
 def edu(request):
     """学校页面，教务管理员下拉接口"""
     school_code = request.GET.get('school_code')
-    sql = "select admin_name from admin_user where school_code='%s'" % school_code
+    sql = "select admin_name from admin_user where admin_state='True' and school_code='%s'" % school_code
     admin_name = SqlModel().select_all(sql)
     admin_name_list = []
     if admin_name:
@@ -184,16 +184,16 @@ class Edu(View):
     """教务管理"""
     def get(self,request):
         """教务页面展示"""
-        admin_user = request.COOKIES.get('username')
+        # admin_user = request.COOKIES.get('username')
+        admin_user = request.GET.get('admin_user')
         sql = "select school_code from admin_user where admin_user='%s'" % admin_user
         try:
             school_code = SqlModel().select_one(sql)
             if school_code:
                 school_code = school_code[0]
-                sql = "select admin_name,admin_user,admin_pass,phone,admin_state,create_name,create_time from admin_user where school_code='%s'" % int(school_code)
+                sql = "select admin_name,admin_user,admin_pass,phone,admin_state,create_name,create_time from admin_user where admin_type='2' and school_code='%s'" % int(school_code)
                 edu_list = SqlModel().select_all(sql)
                 if edu_list:
-                    print(edu_list)
                     for i in edu_list:
                         i[6] = str(i[6])[:10]
                     return JsonResponse({"resutlt": edu_list})
@@ -484,3 +484,64 @@ class Class_down(View):
             return JsonResponse({"result": admin_list})
         else:
             return JsonResponse({"result": ""})
+
+
+class Teacher(View):
+    """教师模块，展示、新增、修改"""
+    def get(self,request):
+        """展示功能"""
+        admin_user = request.COOKIES.get("username")
+        # admin_user = request.GET.get("admin_user")   # 测试用
+        sql = "select admin_name,admin_user,admin_pass,phone,admin_state,create_name,create_time from admin_user as A inner join (select school_code from admin_user where admin_user='%s') as B on A.school_code = B.school_code where A.admin_type='3'" % admin_user
+        try:
+            admin_list = SqlModel().select_all(sql)
+            if admin_list:
+                for i in admin_list:
+                    i[6] = str(i[6])[:10]
+                return JsonResponse({"result": admin_list})
+            else:
+                return JsonResponse({"result": ""})
+        except:
+            return JsonResponse({"result": "fail","msg": "数据库错误，请重试"})
+
+    def post(self,request):
+        """新增、修改"""
+        username = request.COOKIES.get("username")   # 登入者帐号
+        # username = request.POST.get("username")      # 测试用
+
+        admin_name = request.POST.get("admin_name")
+        admin_user = request.POST.get("admin_user")
+        admin_pass = request.POST.get("admin_pass")
+        phone = request.POST.get("phone")
+        admin_state = request.POST.get("admin_state")
+        now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
+
+        try:
+            sql = "select admin_name,school_code from admin_user where admin_user='%s'" % username
+            admin_list = SqlModel().select_one(sql)
+            if admin_list:
+                create_name = admin_list[0]
+                school_code = admin_list[1]
+
+                sql_res = "select * from admin_user where admin_user='%s'" % admin_user
+                res = SqlModel().select_one(sql_res)
+                print("============",res)
+                if res:
+                    """修改,更新"""
+                    sql_up = "update admin_user set admin_name='%s',admin_user='%s',admin_pass='%s',admin_type='%s',phone='%s',school_code='%s',admin_state='%s',create_name='%s',create_time='%s' where admin_user='%s'" % (admin_name,admin_user,admin_pass,'3',int(phone),int(school_code),admin_state,create_name,now_time,admin_user)
+                    print(sql_up)
+                    res_up = SqlModel().insert_or_update(sql_up)
+                    if res_up:
+                        return JsonResponse({"result": "修改成功"})
+                    else:
+                        return JsonResponse({"result": "修改失败"})
+                else:
+                    """新增"""
+                    sql_add = "insert into admin_user (admin_name,admin_user,admin_pass,admin_type,phone,school_code,admin_state,create_name,create_time) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (admin_name,admin_user,admin_pass,'3',phone,school_code,admin_state,create_name,now_time)
+                    res_add = SqlModel().insert_or_update(sql_add)
+                    if res_add:
+                        return JsonResponse({"result": "新增成功"})
+                    else:
+                        return JsonResponse({"result": "新增失败"})
+        except:
+            return JsonResponse({"result": "fail","msg": "数据库错误，请重试"})
