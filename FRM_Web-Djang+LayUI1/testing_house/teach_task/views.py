@@ -73,11 +73,23 @@ class School(View):
             school_info = SqlModel().select_all(sql)
         except:
             return JsonResponse({"result": "数据库查询错误，请重试"})
-
         if school_info:
+            data_list = []
             for i in school_info:
                 i[8] = str(i[8])[:10]
-            return JsonResponse({"result": school_info})
+                data = {
+                    "a": i[0],
+                    "b": i[1],
+                    "c": i[2],
+                    "d": i[3],
+                    "e": i[4],
+                    "f": i[5],
+                    'g': i[6],
+                    "h": i[7],
+                    "i": i[8]
+                }
+                data_list.append(data)
+            return JsonResponse({"result": data_list})
         else:
             return JsonResponse({"result": ""})
 
@@ -137,7 +149,22 @@ class School_delete_search(View):
         try:
             school_info = SqlModel().select_all(sql)
             if school_info:
-                return JsonResponse({"result": school_info})
+                data_list = []
+                for i in school_info:
+                    i[8] = str(i[8])[:10]
+                    data = {
+                        "a": i[0],
+                        "b": i[1],
+                        "c": i[2],
+                        "d": i[3],
+                        "e": i[4],
+                        "f": i[5],
+                        'g': i[6],
+                        'h': i[7],
+                        'i': i[8]
+                    }
+                    data_list.append(data)
+                return JsonResponse({"result": data_list})
             else:
                 return JsonResponse({"result": ""})
         except:
@@ -150,7 +177,7 @@ def province(request):
     for i in province_city:
         province_list.append(i["name"])
 
-    return JsonResponse({"result":province_list})
+    return JsonResponse({"result": province_list})
 
 
 def city(request):
@@ -184,8 +211,8 @@ class Edu(View):
     """教务管理"""
     def get(self,request):
         """教务页面展示"""
-        # admin_user = request.COOKIES.get('username')
-        admin_user = request.GET.get('admin_user')
+        admin_user = request.COOKIES.get('username')
+        # admin_user = request.GET.get('admin_user')
         sql = "select school_code from admin_user where admin_user='%s'" % admin_user
         try:
             school_code = SqlModel().select_one(sql)
@@ -194,9 +221,21 @@ class Edu(View):
                 sql = "select admin_name,admin_user,admin_pass,phone,admin_state,create_name,create_time from admin_user where admin_type='2' and school_code='%s'" % int(school_code)
                 edu_list = SqlModel().select_all(sql)
                 if edu_list:
+                    data_list = []
                     for i in edu_list:
                         i[6] = str(i[6])[:10]
-                    return JsonResponse({"resutlt": edu_list})
+                        data = {
+                            "a": i[0],
+                            "b": i[1],
+                            "c": i[2],
+                            "d": i[3],
+                            "e": i[4],
+                            "f": i[5],
+                            'g': i[6]
+                        }
+                        data_list.append(data)
+
+                    return JsonResponse({"resutlt": data_list})
                 else:
                     return JsonResponse({"result": ""})
             else:
@@ -283,15 +322,25 @@ class Major(View):
                 sql_info = "select major_code,major_name,major_state,create_name,create_time from major where school_code='%s'" % int(school_code[0])
                 major_list = SqlModel().select_all(sql_info)
                 if major_list:
+                    data_list = []
+
                     for i in major_list:
                         i[4] = str(i[4])[:10]
-                    return JsonResponse({"result": major_list})
+                        data = {
+                            "a": i[0],
+                            "b": i[1],
+                            "c": i[2],
+                            "d": i[3],
+                            "e": i[4]
+                        }
+                        data_list.append(data)
+                    return JsonResponse({"result": data_list})
                 else:
                     return JsonResponse({"result": ""})
             else:
                 return JsonResponse({"result": "该登入帐号没有对应学校，无法显示专业信息"})
         except:
-            return JsonResponse({"result": "fail","msg": "数据库错误，请重试"})
+            return JsonResponse({"result": "fail", "msg": "数据库错误，请重试"})
 
     def post(self,request):
         """POST请求，新增、修改逻辑"""
@@ -346,7 +395,18 @@ class Major_delete_search(View):
         try:
             major_list = SqlModel().select_all(sql)
             if major_list:
-                return JsonResponse({"result": major_list})
+                data_list = []
+                for i in major_list:
+                    i[4] = str(i[4])[:10]
+                    data = {
+                        "a": i[0],
+                        "b": i[1],
+                        "c": i[2],
+                        "d": i[3],
+                        "e": i[4]
+                    }
+                    data_list.append(data)
+                return JsonResponse({"result": data_list})
             else:
                 return JsonResponse({"result": ""})
         except:
@@ -366,7 +426,24 @@ class Class(View):
                 sql_class = "select class_code,class_name,major_name,class_teacher,class_state,begin_time,close_time,create_name,create_time from class where school_code='%s'" % int(school_code[0])
                 class_info = SqlModel().select_all(sql_class)
                 if class_info:
-                    return JsonResponse({"result": class_info})
+                    data_list = []
+                    for i in class_info:
+                        i[5] = str(i[5])[:10]
+                        i[6] = str(i[6])[:10]
+                        i[8] = str(i[8])[:10]
+                        data = {
+                            "a": i[0],
+                            "b": i[1],
+                            "c": i[2],
+                            "d": i[3],
+                            "e": i[4],
+                            "f": i[5],
+                            'g': i[6],
+                            'h': i[7],
+                            'i': i[8]
+                        }
+                        data_list.append(data)
+                    return JsonResponse({"result": data_list})
                 else:
                     return JsonResponse({"result": ""})
             else:
@@ -438,7 +515,24 @@ class Class_delete_search(View):
         try:
             class_list = SqlModel().select_all(sql_class)
             if class_list:
-                return JsonResponse({"result": class_list})
+                data_list = []
+                for i in class_list:
+                    i[5] = str(i[5])[:10]
+                    i[6] = str(i[6])[:10]
+                    i[8] = str(i[8])[:10]
+                    data = {
+                        "a": i[0],
+                        "b": i[1],
+                        "c": i[2],
+                        "d": i[3],
+                        "e": i[4],
+                        "f": i[5],
+                        'g': i[6],
+                        'h': i[7],
+                        'i': i[8]
+                    }
+                    data_list.append(data)
+                return JsonResponse({"result": data_list})
             else:
                 return JsonResponse({"result": ""})
         except:
@@ -496,9 +590,20 @@ class Teacher(View):
         try:
             admin_list = SqlModel().select_all(sql)
             if admin_list:
+                data_list = []
                 for i in admin_list:
                     i[6] = str(i[6])[:10]
-                return JsonResponse({"result": admin_list})
+                    data = {
+                        "a": i[0],
+                        "b": i[1],
+                        "c": i[2],
+                        "d": i[3],
+                        "e": i[4],
+                        "f": i[5],
+                        'g': i[6]
+                    }
+                    data_list.append(data)
+                return JsonResponse({"result": data_list})
             else:
                 return JsonResponse({"result": ""})
         except:
@@ -569,7 +674,21 @@ class Teacher_delete_search(View):
         try:
             class_list = SqlModel().select_all(sql)
             if class_list:
-                return JsonResponse({"result": class_list})
+
+                data_list = []
+                for i in class_list:
+                    i[6] = str(i[6])[:10]
+                    data = {
+                        "a": i[0],
+                        "b": i[1],
+                        "c": i[2],
+                        "d": i[3],
+                        "e": i[4],
+                        "f": i[5],
+                        'g': i[6]
+                    }
+                    data_list.append(data)
+                return JsonResponse({"result": data_list})
             else:
                 return JsonResponse({"result": ""})
         except:
@@ -585,10 +704,25 @@ class Student(View):
         try:
             student_list = SqlModel().select_all(sql_student)
             if student_list:
+                data_list = []
                 for i in student_list:
                     i[5] = str(i[5])[:10]
                     i[8] = str(i[8])[:10]
-                return JsonResponse({"result": student_list})
+                    data = {
+                        "a": i[0],
+                        "b": i[1],
+                        "c": i[2],
+                        "d": i[3],
+                        "e": i[4],
+                        "f": i[5],
+                        'g': i[6],
+                        'h': i[7],
+                        'i': i[8],
+                        'j': i[9],
+                        'k': i[10]
+                    }
+                    data_list.append(data)
+                return JsonResponse({"result": data_list})
             else:
                 return JsonResponse({"result": ""})
         except Exception as e:
