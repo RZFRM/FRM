@@ -108,7 +108,7 @@ class Report(models.Model):
     weight = models.IntegerField(verbose_name='权重')
     report_info = models.CharField(max_length=50, null=True, verbose_name='报表内容')
     student_code = models.IntegerField(verbose_name='学号')
-    score = models.IntegerField(verbose_name='得分')
+    score = models.IntegerField(null=True, verbose_name='得分')
     create_time = models.DateTimeField(verbose_name='创建时间')
 
     def __str__(self):

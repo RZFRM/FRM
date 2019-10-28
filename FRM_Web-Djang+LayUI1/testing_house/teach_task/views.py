@@ -574,7 +574,6 @@ class Class_down(View):
             admin_list = []
             for i in admin_name_list:
                 admin_list.append(i[0])
-            print(admin_list)
             return JsonResponse({"result": admin_list})
         else:
             return JsonResponse({"result": ""})
@@ -630,11 +629,9 @@ class Teacher(View):
 
                 sql_res = "select * from admin_user where admin_user='%s'" % admin_user
                 res = SqlModel().select_one(sql_res)
-                print("============",res)
                 if res:
                     """修改,更新"""
                     sql_up = "update admin_user set admin_name='%s',admin_user='%s',admin_pass='%s',admin_type='%s',phone='%s',school_code='%s',admin_state='%s',create_name='%s',create_time='%s' where admin_user='%s'" % (admin_name,admin_user,admin_pass,'3',int(phone),int(school_code),admin_state,create_name,now_time,admin_user)
-                    print(sql_up)
                     res_up = SqlModel().insert_or_update(sql_up)
                     if res_up:
                         return JsonResponse({"result": "修改成功"})
@@ -835,6 +832,47 @@ class Student_delete_search(View):
             return JsonResponse({"result": "fail", "msg": "系统错误，请重试"})
 
 
+class Student_down(View):
+    """学生页面，专业、班级下拉接口"""
+    def get(self,request):
+        """专业下拉"""
+        username = request.COOKIES.get("username")
+        # username = request.GET.get("username")  # 测试用
+        sql = "select major_name from major as A inner join (select school_code from admin_user where admin_user='%s') as B on A.school_code = B.school_code" % username
+        try:
+            major_name_list = SqlModel().select_all(sql)
+            if major_name_list:
+                major_list = []
+                for i in major_name_list:
+                    major_list.append(i[0])
+                return JsonResponse({"result": major_list})
+            else:
+                return JsonResponse({"result": ""})
+        except:
+            return JsonResponse({"result": "fail", "msg": "系统错误，请重试"})
+
+    def post(self,request):
+        """班级下拉"""
+        username = request.COOKIES.get("username")
+        # username = request.POST.get("username")  # 测试用
+        major_name = request.POST.get("major_name")
+
+        sql = "select school_code from admin_user where admin_user='%s'" % username
+        school_code_list = SqlModel().select_one(sql)
+        if school_code_list:
+            school_code = school_code_list[0]
+
+            sql_class = "select class_name from class where school_code='%s' and major_name='%s'" % (int(school_code), major_name)
+            class_name_list = SqlModel().select_all(sql_class)
+            if class_name_list:
+                class_list = []
+                for i in class_name_list:
+                    class_list.append(i[0])
+                return JsonResponse({"result": class_list})
+            else:
+                return JsonResponse({"result": ""})
+        else:
+            return JsonResponse({"result": "fail", "msg": "该帐号没有对应学校,无法显示班级信息"})
 
 
 
