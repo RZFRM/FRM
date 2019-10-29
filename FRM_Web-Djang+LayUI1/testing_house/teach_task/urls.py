@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'teacher',views.Teacher.as_view()),
     url(r'student_delete_search',views.Student_delete_search.as_view()),
     url(r'student_down',views.Student_down.as_view()),
+    url(r'student_batch',views.student_batch),
     url(r'student',views.Student.as_view()),
 
 ]

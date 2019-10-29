@@ -5,6 +5,8 @@ from django.shortcuts import render
 
 # Create your views here.
 import datetime
+import os
+import xlrd
 
 from django.http import HttpResponse,JsonResponse
 from django.shortcuts import render
@@ -13,6 +15,7 @@ from .models import User, Major as MAJOR, School as SCHOOL
 from sql_operating.mysql_class import SqlModel
 from .common import province_city
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Index(View):
@@ -737,7 +740,7 @@ class Student(View):
 
     def post(self,request):
         """学生页面新增，修改功能"""
-        admin_user = request.COOKIES.get("username")
+        username = request.COOKIES.get("username")
         # username = request.POST.get("username")  # 测试用
         admin_name = request.POST.get("admin_name")
         admin_user = request.POST.get("admin_user")
@@ -875,6 +878,83 @@ class Student_down(View):
             return JsonResponse({"result": "fail", "msg": "该帐号没有对应学校,无法显示班级信息"})
 
 
+
+
+def student_batch(request):
+    """学生 批量上传"""
+    # 1、读取上传文件--->本地
+    student_major = request.POST.get("student_major")
+    student_class = request.POST.get("student_class")
+    file = request.FILES.get("a")
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media", str(file))
+
+    try:
+        with open(MEDIA_ROOT, "wb") as f:
+            for i in file.chunks():
+                f.write(i)
+
+        # 2、读取本地文件内容,循环添加学生
+        workbook = xlrd.open_workbook(MEDIA_ROOT)    # 打开文件
+        sheet = workbook.sheet_by_index(0)           # 获取第一个文件博
+        maps = {
+            0: "name",
+            1: "student_code",
+            2: "pass",
+            3: "phone"
+        }
+        student_list = []
+        for index in range(1,sheet.nrows):        # 有效行数
+            row = sheet.row(index)                # 获取行的列对象
+            row_dict = {}
+            for i in range(len(maps)):
+                key = maps[i]
+                cell = row[i+1]
+                row_dict[key] = cell.value
+            student_list.append(row_dict)
+    except:
+        return JsonResponse({"result": "文件传递问题，请重试"})
+
+    # username = request.COOKIES.get("username")
+    username = request.POST.get("username")  # 测试用
+    now_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
+    admin_type = '4'
+    sql = "select admin_name,school_code from admin_user where admin_user = '%s'" % username
+    try:
+        admin_list = SqlModel().select_one(sql)
+        if admin_list:
+            create_name = admin_list[0]
+            school_code = admin_list[1]
+
+            for i in student_list:
+                admin_user = int(i["student_code"])
+                admin_name = i["name"]
+                admin_pass = int(i["pass"])
+                phone = i["phone"]
+
+                sql_select = "select * from admin_user where admin_user = '%s'" % admin_user
+                res = SqlModel().select_one(sql_select)
+                if res:
+                    """修改"""
+                    sql_up = "update admin_user set admin_user='%s',admin_name='%s',admin_pass='%s',phone='%s',create_name='%s' where admin_user='%s'" % (str(admin_user),admin_name, admin_pass, phone, create_name, str(admin_user))
+                    sql_up2 = "update student set student_name='%s',student_major='%s',student_class='%s',phone='%s',late_time='%s' where student_code='%s'" % (admin_name, student_major, student_class, phone, now_time, int(admin_user))
+                    SqlModel().insert_or_update(sql_up)
+                    SqlModel().insert_or_update(sql_up2)
+                else:
+                    """新增"""
+                    sql_add = "insert into admin_user (admin_name,admin_user,admin_pass,admin_type,phone,school_code,admin_state,create_name,create_time) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (admin_name, admin_user, admin_pass, admin_type, int(phone), int(school_code), 'True', create_name,now_time)
+                    sql_add2 = "insert into student (student_code,student_name,school_code,student_major,student_class,phone,create_time,late_time) values ('%s','%s','%s','%s','%s','%s','%s','%s')" % (int(admin_user), admin_name, int(school_code), student_major, student_class, int(phone), now_time,now_time)
+                    SqlModel().insert_or_update(sql_add)
+                    SqlModel().insert_or_update(sql_add2)
+
+            return JsonResponse({"result": "OK"})
+        else:
+            return JsonResponse({"result": "fail", "msg": "该帐号没有对应学校，无法进行操作"})
+    except:
+        return JsonResponse({"result": "fail", "msg": "系统错误，请重试"})
+
+
+def student_download(request):
+    """模版下载"""
 
 
 
